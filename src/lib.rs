@@ -1,8 +1,8 @@
 use clap::{command, Arg, ArgAction};
 
 pub struct Input {
-  pub files: Vec<String>,
-  pub count: bool,
+    pub files: Vec<String>,
+    pub count: bool,
 }
 
 pub fn get_args() -> Input {
@@ -30,7 +30,8 @@ pub fn get_args() -> Input {
         )
         .arg(
             Arg::new("files")
-                .action(ArgAction::Append).action(ArgAction::Append)
+                .action(ArgAction::Append)
+                .action(ArgAction::Append)
                 .default_value("-"),
         )
         .get_matches();
