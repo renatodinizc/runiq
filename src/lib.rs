@@ -15,6 +15,20 @@ pub fn get_args() -> Input {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("unique")
+                .help("only print unique lines")
+                .short('u')
+                .long("unique")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
+            Arg::new("ignore-case")
+                .help("ignore differences in case when comparing")
+                .short('i')
+                .long("ignore-case")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("files")
                 .action(ArgAction::Append).action(ArgAction::Append)
                 .default_value("-"),
