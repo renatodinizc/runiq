@@ -1,3 +1,9 @@
+use runiq::get_args;
+
 fn main() {
-    println!("Hello, world!");
+    let input = get_args();
+
+    if input.files.len() > 2 {
+        eprintln!("uniq: extra operand ‘{}’\nTry 'runiq --help' for more information.", input.files.last().unwrap())
+    }
 }
