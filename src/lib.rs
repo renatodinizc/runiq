@@ -4,7 +4,7 @@ use std::fmt;
 use std::fs::File;
 pub struct Args {
     pub files: Vec<Input>,
-    pub count: bool,
+    count: bool,
     pub unique: bool,
     pub ignore_case: bool
 }
@@ -81,12 +81,24 @@ pub fn execute(file: &Input, args: &Args) {
     }
 }
 
+fn read_from_stdin(args: &Args) {
+    let stdin = BufReader::new(io::stdin());
+    let result = process(stdin);
+
+    display_result(result, args);
+}
+
 fn read_from_file(file: &str, args: &Args) {
     if let Err(error) = File::open(file) { return eprintln!("runiq: {}: {}", file, error) }
 
     let content = File::open(file).unwrap();
     let buffer = BufReader::new(content);
+    let result = process(buffer);
 
+    display_result(result, args);
+}
+
+fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
     let mut results: Vec<(String, u32)> = Vec::new();
 
     for line in buffer.lines() {
@@ -105,39 +117,12 @@ fn read_from_file(file: &str, args: &Args) {
             },
         }
     }
-    for (content, count) in results {
-        if args.count {
-            println!("{:7} {content}", count);
-        } else {
-            println!("{content}");
-        }
-    }
+
+    results
 }
 
-fn read_from_stdin(args: &Args) {
-    let stdin = io::stdin();
-
-
-    let mut results: Vec<(String, u32)> = Vec::new();
-
-    for line in stdin.lines() {
-        match line {
-            Err(error) => eprintln!("{error}"),
-            Ok(content) => {
-                if results.len() == 0 {
-                    results.push((content, 1));
-                } else if results.last().unwrap().0 == content {
-                    let counter = results.last().unwrap().1 + 1;
-                    results.pop();
-                    results.push((content, counter));
-                } else {
-                    results.push((content, 1));
-                }
-            },
-        }
-    }
-
-    for (content, count) in results {
+fn display_result(result: Vec<(String, u32)>, args: &Args) {
+    for (content, count) in result {
         if args.count {
             println!("{:7} {content}", count);
         } else {
