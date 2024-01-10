@@ -7,7 +7,7 @@ pub struct Args {
     count: bool,
     unique: bool,
     repeated: bool,
-    pub ignore_case: bool,
+    ignore_case: bool,
 }
 
 pub enum Input {
@@ -92,7 +92,7 @@ pub fn execute(file: &Input, args: &Args) {
 
 fn read_from_stdin(args: &Args) {
     let stdin = BufReader::new(io::stdin());
-    let result = process(stdin);
+    let result = process(stdin, args);
 
     display_result(result, args);
 }
@@ -104,12 +104,12 @@ fn read_from_file(file: &str, args: &Args) {
 
     let content = File::open(file).unwrap();
     let buffer = BufReader::new(content);
-    let result = process(buffer);
+    let result = process(buffer, args);
 
     display_result(result, args);
 }
 
-fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
+fn process(buffer: impl BufRead, args: &Args) -> Vec<(String, u32)> {
     let mut results: Vec<(String, u32)> = Vec::new();
 
     for line in buffer.lines() {
@@ -118,10 +118,12 @@ fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
             Ok(content) => {
                 if results.is_empty() {
                     results.push((content, 1));
+                } else if args.ignore_case
+                    && results.last().unwrap().0.to_lowercase() == content.to_lowercase()
+                {
+                    results.last_mut().unwrap().1 += 1;
                 } else if results.last().unwrap().0 == content {
-                    let counter = results.last().unwrap().1 + 1;
-                    results.pop();
-                    results.push((content, counter));
+                    results.last_mut().unwrap().1 += 1;
                 } else {
                     results.push((content, 1));
                 }
