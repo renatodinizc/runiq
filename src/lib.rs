@@ -5,7 +5,8 @@ use std::io::{self, BufRead, BufReader};
 pub struct Args {
     pub files: Vec<Input>,
     count: bool,
-    pub unique: bool,
+    unique: bool,
+    repeated: bool,
     pub ignore_case: bool,
 }
 
@@ -40,6 +41,13 @@ pub fn get_args() -> Args {
                 .action(ArgAction::SetTrue),
         )
         .arg(
+            Arg::new("repeated")
+                .help("only print duplicate lines, one for each group")
+                .short('d')
+                .long("repeated")
+                .action(ArgAction::SetTrue),
+        )
+        .arg(
             Arg::new("ignore-case")
                 .help("ignore differences in case when comparing")
                 .short('i')
@@ -70,6 +78,7 @@ pub fn get_args() -> Args {
         files,
         count: *matches.get_one::<bool>("count").unwrap(),
         unique: *matches.get_one::<bool>("unique").unwrap(),
+        repeated: *matches.get_one::<bool>("repeated").unwrap(),
         ignore_case: *matches.get_one::<bool>("ignore-case").unwrap(),
     }
 }
@@ -125,6 +134,12 @@ fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
 
 fn display_result(result: Vec<(String, u32)>, args: &Args) {
     for (content, count) in result {
+        if args.unique && count != 1 {
+            continue;
+        }
+        if args.repeated && count == 1 {
+            continue;
+        }
         if args.count {
             println!("{:7} {content}", count);
         } else {
