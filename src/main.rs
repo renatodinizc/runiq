@@ -5,7 +5,7 @@ fn main() {
 
     if args.files.len() > 2 {
         return eprintln!(
-            "uniq: extra operand ‘{}’\nTry 'runiq --help' for more information.",
+            "runiq: extra operand ‘{}’\nTry 'runiq --help' for more information.",
             args.files[2]
         );
     }
