@@ -1,4 +1,4 @@
-use runiq::{ get_args, execute };
+use runiq::{execute, get_args};
 
 fn main() {
     let args = get_args();
@@ -7,7 +7,7 @@ fn main() {
         return eprintln!(
             "uniq: extra operand ‘{}’\nTry 'runiq --help' for more information.",
             args.files[2]
-        )
+        );
     }
 
     for file in &args.files {

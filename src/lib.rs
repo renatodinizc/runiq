@@ -1,17 +1,17 @@
 use clap::{command, Arg, ArgAction};
-use std::io::{ self, BufRead, BufReader };
 use std::fmt;
 use std::fs::File;
+use std::io::{self, BufRead, BufReader};
 pub struct Args {
     pub files: Vec<Input>,
     count: bool,
     pub unique: bool,
-    pub ignore_case: bool
+    pub ignore_case: bool,
 }
 
 pub enum Input {
     File(String),
-    Stdin
+    Stdin,
 }
 
 impl fmt::Display for Input {
@@ -67,7 +67,7 @@ pub fn get_args() -> Args {
         .collect::<Vec<Input>>();
 
     Args {
-        files: files,
+        files,
         count: *matches.get_one::<bool>("count").unwrap(),
         unique: *matches.get_one::<bool>("unique").unwrap(),
         ignore_case: *matches.get_one::<bool>("ignore-case").unwrap(),
@@ -89,7 +89,9 @@ fn read_from_stdin(args: &Args) {
 }
 
 fn read_from_file(file: &str, args: &Args) {
-    if let Err(error) = File::open(file) { return eprintln!("runiq: {}: {}", file, error) }
+    if let Err(error) = File::open(file) {
+        return eprintln!("runiq: {}: {}", file, error);
+    }
 
     let content = File::open(file).unwrap();
     let buffer = BufReader::new(content);
@@ -105,7 +107,7 @@ fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
         match line {
             Err(error) => eprintln!("{error}"),
             Ok(content) => {
-                if results.len() == 0 {
+                if results.is_empty() {
                     results.push((content, 1));
                 } else if results.last().unwrap().0 == content {
                     let counter = results.last().unwrap().1 + 1;
@@ -114,7 +116,7 @@ fn process(buffer: impl BufRead) -> Vec<(String, u32)> {
                 } else {
                     results.push((content, 1));
                 }
-            },
+            }
         }
     }
 
