@@ -1,6 +1,6 @@
 # Rust UNIQ Utility
 
-`runiq` is a simple command-line utility written in Rust that filters adjacent matching lines from input. It can be used to count, filter unique lines, or print duplicate lines from a given set of files or standard input.
+`runiq` is a simple command-line utility written in Rust that mimics the functionality of the classic GNU uniq command, that filters adjacent matching lines from input. It can be used to count, filter unique lines, or print duplicate lines from a given set of files or standard input.
 
 ## Usage
 
