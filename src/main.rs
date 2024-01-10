@@ -1,12 +1,16 @@
-use runiq::get_args;
+use runiq::{ get_args, execute };
 
 fn main() {
-    let input = get_args();
+    let args = get_args();
 
-    if input.files.len() > 2 {
-        eprintln!(
+    if args.files.len() > 2 {
+        return eprintln!(
             "uniq: extra operand ‘{}’\nTry 'runiq --help' for more information.",
-            input.files[2]
+            args.files[2]
         )
+    }
+
+    for file in &args.files {
+        execute(file, &args)
     }
 }
