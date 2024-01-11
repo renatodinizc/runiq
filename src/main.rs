@@ -3,7 +3,6 @@ use runiq::{execute, get_args};
 fn main() {
     let args = get_args();
 
-
     if args.files.len() >= 3 {
         eprintln!(
             "runiq: extra operand ‘{}’\nTry 'runiq --help' for more information.",

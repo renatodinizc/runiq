@@ -2,6 +2,7 @@ use clap::{command, Arg, ArgAction};
 use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
+
 pub struct Args {
     pub files: Vec<String>,
     count: bool,
