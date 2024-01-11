@@ -1,27 +1,12 @@
 use clap::{command, Arg, ArgAction};
-use std::fmt;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 pub struct Args {
-    pub files: Vec<Input>,
+    pub files: Vec<String>,
     count: bool,
     unique: bool,
     repeated: bool,
     ignore_case: bool,
-}
-
-pub enum Input {
-    File(String),
-    Stdin,
-}
-
-impl fmt::Display for Input {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Input::File(file_path) => write!(f, "{}", file_path),
-            Input::Stdin => write!(f, "this is stdin"),
-        }
-    }
 }
 
 pub fn get_args() -> Args {
@@ -65,14 +50,8 @@ pub fn get_args() -> Args {
     let files = matches
         .get_many::<String>("files")
         .unwrap()
-        .map(|f| {
-            if f == "-" {
-                Input::Stdin
-            } else {
-                Input::File(f.to_string())
-            }
-        })
-        .collect::<Vec<Input>>();
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>();
 
     Args {
         files,
@@ -83,10 +62,11 @@ pub fn get_args() -> Args {
     }
 }
 
-pub fn execute(file: &Input, args: &Args) {
-    match file {
-        Input::Stdin => read_from_stdin(args),
-        Input::File(file_path) => read_from_file(file_path, args),
+pub fn execute(file: &str, args: &Args) {
+    if file == "-" {
+        read_from_stdin(args)
+    } else {
+        read_from_file(file, args)
     }
 }
 
