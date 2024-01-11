@@ -40,7 +40,7 @@ runiq -i file.txt
 Ensure you have Rust installed on your system. Then, clone the repository and build the project using the following commands:
 
 ```bash
-git clone https://github.com/yourusername/runiq.git
+git clone git@github.com:renatodinizc/runiq.git
 cd runiq
 cargo build --release
 ```
