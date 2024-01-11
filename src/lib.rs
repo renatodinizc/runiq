@@ -1,27 +1,13 @@
 use clap::{command, Arg, ArgAction};
-use std::fmt;
+use std::fs;
 use std::fs::File;
 use std::io::{self, BufRead, BufReader};
 pub struct Args {
-    pub files: Vec<Input>,
+    pub files: Vec<String>,
     count: bool,
     unique: bool,
     repeated: bool,
     ignore_case: bool,
-}
-
-pub enum Input {
-    File(String),
-    Stdin,
-}
-
-impl fmt::Display for Input {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        match self {
-            Input::File(file_path) => write!(f, "{}", file_path),
-            Input::Stdin => write!(f, "this is stdin"),
-        }
-    }
 }
 
 pub fn get_args() -> Args {
@@ -65,14 +51,8 @@ pub fn get_args() -> Args {
     let files = matches
         .get_many::<String>("files")
         .unwrap()
-        .map(|f| {
-            if f == "-" {
-                Input::Stdin
-            } else {
-                Input::File(f.to_string())
-            }
-        })
-        .collect::<Vec<Input>>();
+        .map(|f| f.to_string())
+        .collect::<Vec<String>>();
 
     Args {
         files,
@@ -83,30 +63,43 @@ pub fn get_args() -> Args {
     }
 }
 
-pub fn execute(file: &Input, args: &Args) {
-    match file {
-        Input::Stdin => read_from_stdin(args),
-        Input::File(file_path) => read_from_file(file_path, args),
+pub fn execute(file: &str, args: &Args, output_file: Option<&String>) {
+    let final_result = if file == "-" {
+        read_from_stdin(args)
+    } else {
+        read_from_file(file, args)
+    };
+
+    match output_file {
+        None => {
+            for line in final_result {
+                println!("{line}");
+            }
+        }
+        Some(output_file) => {
+            fs::write(output_file, final_result.join("\n")).expect("Unable to write to file");
+        }
     }
 }
 
-fn read_from_stdin(args: &Args) {
+fn read_from_stdin(args: &Args) -> Vec<String> {
     let stdin = BufReader::new(io::stdin());
     let result = process(stdin, args);
 
-    display_result(result, args);
+    display_result(result, args)
 }
 
-fn read_from_file(file: &str, args: &Args) {
+fn read_from_file(file: &str, args: &Args) -> Vec<String> {
     if let Err(error) = File::open(file) {
-        return eprintln!("runiq: {}: {}", file, error);
+        eprintln!("runiq: {}: {}", file, error);
+        return vec!["".to_string()];
     }
 
     let content = File::open(file).unwrap();
     let buffer = BufReader::new(content);
     let result = process(buffer, args);
 
-    display_result(result, args);
+    display_result(result, args)
 }
 
 fn process(buffer: impl BufRead, args: &Args) -> Vec<(String, u32)> {
@@ -134,7 +127,8 @@ fn process(buffer: impl BufRead, args: &Args) -> Vec<(String, u32)> {
     results
 }
 
-fn display_result(result: Vec<(String, u32)>, args: &Args) {
+fn display_result(result: Vec<(String, u32)>, args: &Args) -> Vec<String> {
+    let mut final_text: Vec<String> = Vec::new();
     for (content, count) in result {
         if args.unique && count != 1 {
             continue;
@@ -143,9 +137,11 @@ fn display_result(result: Vec<(String, u32)>, args: &Args) {
             continue;
         }
         if args.count {
-            println!("{:7} {content}", count);
+            final_text.push(format!("{:7} {content}", count));
         } else {
-            println!("{content}");
+            final_text.push(content);
         }
     }
+
+    final_text
 }
