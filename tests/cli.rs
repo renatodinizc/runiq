@@ -130,3 +130,39 @@ fn process_file4_with_ci_flags() {
       2 Cenoura\n",
     );
 }
+
+#[test]
+fn process_stdin() {
+    let mut cmd = Command::cargo_bin("runiq").unwrap();
+
+    cmd.arg("-cu");
+    cmd.write_stdin("apple\napple\napple\ngrape\nbanana");
+
+    cmd.assert().success().stdout(
+        "      1 grape
+      1 banana\n",
+    );
+}
+
+#[test]
+fn process_stdin2() {
+    let mut cmd = Command::cargo_bin("runiq").unwrap();
+
+    cmd.arg("-ui");
+    cmd.write_stdin("Apple\napple\norange\napple\nBanana\nBaNaNa");
+
+    cmd.assert().success().stdout(
+        "orange
+apple\n",
+    );
+}
+
+#[test]
+fn process_stdin3() {
+    let mut cmd = Command::cargo_bin("runiq").unwrap();
+
+    cmd.arg("-cdi");
+    cmd.write_stdin("apple\nApple\nbanana\nOrange\nApple");
+
+    cmd.assert().success().stdout("      2 apple\n");
+}
