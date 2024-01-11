@@ -55,13 +55,12 @@ Here are three test cases to demonstrate the functionality of of various flags i
 
 #### Input
 ```bash
-echo -e "apple\norange\napple\nbanana" | runiq -c -u
+echo -e "apple\napple\napple\ngrape\nbanana" | runiq -cu
 ```
 
 #### Expected Output
 ```
-      2 apple
-      1 orange
+      1 grape
       1 banana
 ```
 
@@ -69,27 +68,25 @@ echo -e "apple\norange\napple\nbanana" | runiq -c -u
 
 #### Input
 ```bash
-echo -e "Apple\norange\napple\nBanana" | runiq -d -i
+echo -e "Apple\napple\norange\napple\nBanana\nBaNaNa" | runiq -ui
 ```
 
 #### Expected Output
 ```
-Apple
 orange
-Banana
+apple
 ```
 
-### Test Case 3: Counting Repeated Lines, Ignoring Case
+### Test Case 3: Counting Sequentially Repeated Lines, Ignoring Case
 
 #### Input
 ```bash
-echo -e "apple\norange\nApple\nbanana\nOrange\nApple" | runiq -c -d -i
+echo -e "apple\nApple\nbanana\nOrange\nApple" | runiq -cdi
 ```
 
 #### Expected Output
 ```
-      3 apple
-      2 orange
+      2 apple
 ```
 
 These test cases showcase more complex scenarios by combining multiple flags. Feel free to experiment with different combinations of flags to suit your specific use cases.
